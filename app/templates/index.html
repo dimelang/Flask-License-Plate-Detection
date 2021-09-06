@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>License Plate Detection</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css' )}}">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+        integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp">
+</head>
+
+<body>
+    <div id="selectedAssets" class="alert alert-danger alert-dismissible" role="alert" style="display:none">
+        <strong>Ooops..!</strong> You must fill all fields completely.
+        <button type="button" id="closeAlert1" class="close" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+        <div id="selectedAssetsDetails"> </div>
+    </div>
+
+    <div id="mySidenav" class="sidenav">
+        <a id="close" class="closebtn">&times;</a>
+
+        <ul id="list" class="list-group list-group-flush p-1">
+            <!-- <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a> -->
+        </ul>
+
+    </div>
+    <div id="main" class="container-fluid vh-100">
+        <div class="container-fluid d-flex flex-column h-100 justify-content-center">
+            <div class="container-fluid p-2 my-2 my-shadows rounded" style="background-color: #3C415C;">
+                <div class="wrapper">
+                    <div id="choose-camera" class="icon camera" data-toggle="modal" data-target="#chooseCamera">
+                        <div class="tooltip">Camera</div>
+                        <span class="material-icons-outlined">local_see</span>
+                    </div>
+                    <div id="choose-video" class="icon local" data-toggle="modal" data-target="#chooseVideo">
+                        <div class="tooltip">Video</div>
+                        <span class="material-icons-outlined">camera_roll</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="videoContainer" class="container-fluid border rounded mb-1 h-100">
+                {% if filename %}
+                <img id="videoView" src="{{url_for('video_feed',url=filename)}}" class="img-thumbnail mx-auto d-block"
+                    alt="Example" style="height: 0;min-height: 100%;">
+                {% endif %}
+            </div>
+
+            <div id="videButton" class="container-fluid mb-1 d-flex flex-row justify-content-center">
+                <!-- <button type="button" class="btn btn-outline-dark ml-1"><i
+                        class="fas fa-pause-circle fa-2x"></i></button>
+                <button id="play" type="button" class="btn btn-outline-dark ml-1"><i
+                        class="fas fa-play-circle fa-2x"></i></button> -->
+                <button id="stop" type="button" class="btn btn-outline-dark ml-1"><i
+                        class="fas fa-stop-circle fa-2x"></i></button>
+                <button id="listVideo" type="button" class="btn btn-outline-dark ml-1" data-toggle="tooltip"
+                    data-placement="top" title="List Video">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal camera -->
+    <div class="modal fade" id="chooseCamera" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Choose Camera</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-select" id="select-camera" aria-label="Example select with button addon">
+                        <option selected>Choose camera</option>
+                        <option value="1">Webcam</option>
+                        <option value="2">CCTV</option>
+                    </select>
+
+                    <button class="btn btn-outline-secondary" id="webcam" data-dismiss="modal"
+                        type="button">Proccess</button>
+
+                    <div class="container-fluid" id="cctvConfig">
+                        <div class="mb-3">
+                            <label for="username" class="col-form-label">Username:</label>
+                            <input type="text" class="form-control" name="username" id="username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="col-form-label">Password:</label>
+                            <div class="input-group mb-3">
+                                <input type="password" name="password" id="password" class="form-control">
+                                <button class="btn btn-outline-secondary " type="button" id="showPass"><i
+                                        class="fa fa-eye-slash"></i></button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ip" class="col-form-label">IP:</label>
+                            <input type="text" name="ip" class="form-control" id="ip">
+                        </div>
+                        <button id="cctv" class="btn btn-outline-secondary" data-dismiss="modal"
+                            type="button">Proccess</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal video -->
+    <div class="modal fade" id="chooseVideo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Choose Video</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="upload-file" method="post" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <input type="file" class="form-control" accept="video/*" name="videoFile"
+                                aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                            <button class="btn btn-outline-secondary " data-dismiss="modal" type="button"
+                                id="submitVideo">Process</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal load model -->
+    <div class="modal fade" id="loadModel" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="text-center">
+                        <button class="btn btn-dark" type="button" disabled>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading Model
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"
+    integrity="sha512-6Jym48dWwVjfmvB0Hu3/4jn4TODd6uvkxdi9GNbBHwZ4nGcRxJUCaTkL3pVY6XUQABqFo3T58EMXFQztbjvAFQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js">
+</script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js">
+</script>
+
+<script src="{{ url_for('static',filename='main.js') }}"></script>
+
+</html>
+<!-- 
+<div class="camera-choose-field">
+    <form action="/" method="POST">
+        <input type="submit" value="Choose">
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+            <option selected>Choose Camera</option>
+            <option value="1">Webcam</option>
+            <option value="2">CCTV</option>
+        </select>
+    </form>
+</div> -->
+
+<!-- <div class="file-choose-field">
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept="video/*" id="upload" class="btn-upload">
+        <input type="submit" value="Upload">
+    </form>
+</div> -->
